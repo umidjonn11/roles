@@ -2,6 +2,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { LoginDto } from './dto/login-auth.dto';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
+import { log } from 'console';
 
 @Injectable()
 export class AuthService {
@@ -10,19 +11,17 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
   async login(loginData: LoginDto) {
-    console.log(loginData);
     const user = await this.userService.validateUser(
       loginData.username,
       loginData.password,
     );
     const token = await this.jwtService.signAsync({
-      id: user.id,
-      role: user.role,
-      username: user.username,
+      id: user?.id,
+      role: user?.role,
+      username: user?.username,
     });
-    console.log(await this.jwtService.verifyAsync(token));
 
-    const refreshToken = await this.jwtService.sign(
+    const refreshToken =  await this.jwtService.sign(
       {
         id: user.id,
         role: user.role,
@@ -30,8 +29,22 @@ export class AuthService {
       },
       { secret: process.env.REFRESH_TOKEN_SECRET, expiresIn: '7d' },
     );
+    
     await this.userService.updateUser(user.id, { refreshToken: refreshToken });
 
-    return { user, token };
+    return { user, token,refreshToken };
+  }
+  async create(data: any) {
+    const user = await this.userService.create(data);
+    return user;
+  }
+  async refersh(token: string) {
+    const user = await this.userService.refresh(token);
+    const access = await this.jwtService.signAsync({
+      id: user?.id,
+      role: user?.role,
+      username: user?.username,
+    });
+    return { user, access };
   }
 }
