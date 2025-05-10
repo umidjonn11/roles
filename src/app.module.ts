@@ -3,6 +3,8 @@ import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserRepository } from './user/entities/user.entity';
 import { AuthModule } from './auth/auth.module';
+import { CourseModule } from './course/course.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -15,7 +17,6 @@ import { AuthModule } from './auth/auth.module';
     synchronize:true,
     entities:[UserRepository],
     autoLoadEntities:true,
-
-  }), AuthModule],
+  }), AuthModule, CourseModule,RedisModule],
 })
 export class AppModule {}
