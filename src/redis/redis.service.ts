@@ -6,10 +6,12 @@ export class RedisService implements OnModuleInit {
   private client: Redis;
 
   async onModuleInit() {
+    console.log(process.env.REDIS_HOST, Number(process.env.REDIS_PORT));
+
     this.client = new Redis({
       // 🔥 Bu yerda endi xatolik bo‘lmaydi
-      host: process.env.REDIS_HOST,
-      port: Number(process.env.REDIS_PORT),
+      host: 'localhost',
+      port: 6379,
     });
 
     this.client.on('connect', () => {
